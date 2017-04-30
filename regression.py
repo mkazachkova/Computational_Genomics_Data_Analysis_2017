@@ -27,12 +27,17 @@ lin2 = linear_model.LinearRegression()
 lin2_fit = lin2.fit(X_train2, y_train2)
 
 #calculate R^2 wth test sets
-print lin_fit.score(X_test, y_test) #-0.904163717163
-print lin2_fit.score(X_test2, y_test2) #-0.172005711613
+print lin_fit.score(X_test, y_test) 
+print lin2_fit.score(X_test2, y_test2) 
 
 #cross-validation
-print cross_val_score(lin, snp, ics)  #[-0.90431656 -0.91727751 -0.75193867]
-print cross_val_score(lin2, exp, ics) #[-0.07655055 -0.25684399 -0.31656965]
+lins = cross_val_score(lin, snp, ics, cv=10)  
+lins2 = cross_val_score(lin2, exp, ics, cv = 10) 
+print lins
+print lins2
+print("Accuracy: %0.2f (+/- %0.2f)" % (lins.mean(), lins.std() * 2))
+print("Accuracy: %0.2f (+/- %0.2f)" % (lins2.mean(), lins2.std() * 2))
+
 
 
 #ridge regression
@@ -42,11 +47,13 @@ ridge2 = linear_model.Ridge()
 ridge2_fit = ridge2.fit(X_train2, y_train2)
 
 #calculate R^2 with test sets
-print ridge1.score(X_test, y_test)  #-0.894554561435
-print ridge2.score(X_test2, y_test2) #-0.171934191368
+print ridge1.score(X_test, y_test)  
+print ridge2.score(X_test2, y_test2) 
 
 #cross-validation 
-print cross_val_score(ridge1, snp, ics) #[-0.89550766 -0.79916886 -0.75113175]
-print cross_val_score(ridge2, exp, ics) #[-0.07631259 -0.25673478 -0.31650685]
-  
-
+r = cross_val_score(ridge1, snp, ics, cv=10) 
+r2 = cross_val_score(ridge2, exp, ics, cv = 10) 
+print r
+print r2
+print("Accuracy: %0.2f (+/- %0.2f)" % (r.mean(), r.std() * 2))
+print("Accuracy: %0.2f (+/- %0.2f)" % (r2.mean(), r2.std() * 2))  
