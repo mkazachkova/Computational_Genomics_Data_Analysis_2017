@@ -26,8 +26,8 @@ snp_trans = np.transpose(snp)
 print snp.shape
 print snp_trans.shape
 
-# print 'snp dimension is ' + str(snp.shape)
-# print 'exp dimension is ' + str(exp.shape) 
+print 'snp dimension is ' + str(snp.shape)
+print 'exp dimension is ' + str(exp.shape) 
 
 # split training and test sets
 X_train, X_test, y_train, y_test = train_test_split(snp, ics, test_size = 0.2, random_state=0)
@@ -80,25 +80,35 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(exp, ics, test_size = 0.
 # print "mean square error of ridge regression on SNP is " + str(mean_squared_error(y_test, ridge_predict)) #y_true, y_predict
 # print "mean square error of ridge regression on gene expression is " + str(mean_squared_error(y_test2,ridge2_predict))
 
-# #cross-validation 
-# r = cross_val_score(ridge1, snp, ics, cv=10) 
-# r2 = cross_val_score(ridge2, exp, ics, cv = 10) 
-# print r
-# print r2
-# print("Accuracy: %0.2f (+/- %0.2f)" % (r.mean(), r.std() * 2))
-# print("Accuracy: %0.2f (+/- %0.2f)" % (r2.mean(), r2.std() * 2)) 
+#cross-validation 
+r = cross_val_score(ridge1, snp, ics, cv=10) 
+r2 = cross_val_score(ridge2, exp, ics, cv = 10) 
+print r
+print r2
+print("Accuracy: %0.2f (+/- %0.2f)" % (r.mean(), r.std() * 2))
+print("Accuracy: %0.2f (+/- %0.2f)" % (r2.mean(), r2.std() * 2)) 
 
 
-# #LASSO (not so good)
-# clf = linear_model.Lasso(alpha=0.1)
+# #LASSO (on SNP)
+# clf = linear_model.Lasso(alpha=1)
 # clf_fit = clf.fit(X_train, y_train)
 # print clf.score(X_test,y_test)
 
+# #LASSO (on Gene Expression)
+# clf2 = linear_model.Lasso(alpha=1)
+# clf2_fit = clf2.fit(X_train2, y_train2)
+# print clf2.score(X_test2,y_test2)
 
-# #support vector regression (SVM for regression problem)
-# svr = SVR()
-# svr_fit = svr.fit(X_train, y_train)
-# print svr_fit.score(X_test, y_test)
+#support vector regression (on SNP)
+svr = SVR()
+svr_fit = svr.fit(X_train, y_train)
+print svr_fit.score(X_test, y_test)
+
+#support vector regression (on Gene Expression)
+svr2 = SVR()
+svr2_fit = svr2.fit(X_train2, y_train2)
+print svr2_fit.score(X_test2, y_test2)
+
 
 
 
@@ -117,53 +127,53 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(exp, ics, test_size = 0.
 
 
 #feature selection (does not give better result)
-selector = VarianceThreshold()
-selector.fit(X_train)
-all_var = selector.variances_
-print np.amax(all_var)
-print np.amin(all_var)
+# selector = VarianceThreshold()
+# selector.fit(X_train)
+# all_var = selector.variances_
+# print np.amax(all_var)
+# print np.amin(all_var)
 
 
-var_d = {}
+# var_d = {}
 
-for i in range(0, len(all_var)):
-	var_d[i] = all_var[i]
-
-
-sorted_var_d = sorted(var_d.items(), key=operator.itemgetter(1), reverse=True)
-
-ind = []
-for i in range(50,5000):
-	ind.append(sorted_var_d[i][0])
-
-X_train_selected = []
-X_test_selected = []
-
-tempX = []
-tempXX = []
-for i in range(0,len(ind)):
-	tempX= X_train[0:314,ind[i]]
-	tempXX = X_test[0:79,ind[i]]
-	X_train_selected.append(tempX)
-	X_test_selected.append(tempXX)
+# for i in range(0, len(all_var)):
+# 	var_d[i] = all_var[i]
 
 
-X_train_selected = np.array(X_train_selected)
-X_test_selected = np.array(X_test_selected)
+# sorted_var_d = sorted(var_d.items(), key=operator.itemgetter(1), reverse=True)
 
-X_train_selected = np.transpose(X_train_selected)
-X_test_selected = np.transpose(X_test_selected)
+# ind = []
+# for i in range(50,5000):
+# 	ind.append(sorted_var_d[i][0])
 
-#linear regression after feature selection
-lin = linear_model.LinearRegression()
-lin_fit = lin.fit(X_train_selected, y_train)
+# X_train_selected = []
+# X_test_selected = []
 
-#calculate R^2 wth test sets
-print lin_fit.score(X_test_selected, y_test) 
+# tempX = []
+# tempXX = []
+# for i in range(0,len(ind)):
+# 	tempX= X_train[0:314,ind[i]]
+# 	tempXX = X_test[0:79,ind[i]]
+# 	X_train_selected.append(tempX)
+# 	X_test_selected.append(tempXX)
 
-#calculate MSE
-lin_predict = lin_fit.predict(X_test_selected)
-print "mean square error of linear regression (after feature selection) on SNP is " + str(mean_squared_error(y_test, lin_predict)) #y_true, y_predict
+
+# X_train_selected = np.array(X_train_selected)
+# X_test_selected = np.array(X_test_selected)
+
+# X_train_selected = np.transpose(X_train_selected)
+# X_test_selected = np.transpose(X_test_selected)
+
+# #linear regression after feature selection
+# lin = linear_model.LinearRegression()
+# lin_fit = lin.fit(X_train_selected, y_train)
+
+# #calculate R^2 wth test sets
+# print lin_fit.score(X_test_selected, y_test) 
+
+# #calculate MSE
+# lin_predict = lin_fit.predict(X_test_selected)
+# print "mean square error of linear regression (after feature selection) on SNP is " + str(mean_squared_error(y_test, lin_predict)) #y_true, y_predict
 
 
 
@@ -173,15 +183,47 @@ print "mean square error of linear regression (after feature selection) on SNP i
 # #get the first 500 key-val pairs
 
 
+# #variance over features for SNP
 # sorted_all_var = sorted(all_var, reverse=True)
 # first500 = sorted_all_var[0:500]
-# y_pos = np.arange(500)
-# plt.bar(y_pos,first2000,align='center')
+# y_pos = np.arange(22419)
+# plt.bar(y_pos,sorted_all_var,align='center')
 # # plt.xticks(y_pos, objects)
 # plt.ylabel('Variances')
-# plt.xlabel('features')
-# plt.title('top 500 variance  over features')
-# plt.savefig('snp_var500.png')
+# plt.xlabel('Features')
+# plt.title('Variance over Features on SNP Data')
+# plt.savefig('snp_var.png')
+
+
+
+#variance over features for Gene Expression
+
+#feature selection (does not give better result)
+# selector = VarianceThreshold()
+# selector.fit(X_train2)
+# all_var = selector.variances_
+# sorted_all_var = sorted(all_var, reverse=True)
+# y_pos = np.arange(18926)
+# plt.bar(y_pos,sorted_all_var,align='center')
+# # plt.xticks(y_pos, objects)
+# plt.ylabel('Variances')
+# plt.xlabel('Features')
+# plt.title('Variance over Features on Gene Expression Data')
+# plt.savefig('gene_var.png')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
